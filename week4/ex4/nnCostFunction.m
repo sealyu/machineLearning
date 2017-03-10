@@ -64,38 +64,38 @@ Theta2_grad = zeros(size(Theta2));
 
 %Part1
 X = [ones(m,1) X]; % add the theta 0 line
-h2 = Theta1 * X’ ; % 25×401 * 401xm = 25xm
+h2 = Theta1 * X' ; % 25×401 * 401xm = 25xm
 a2 = sigmoid(h2) ;
-a2 = [ones(m,1) a2′]; % mx26
+a2 = [ones(m,1) a2']; % mx26
 
-h3 = Theta2 * a2′; %10×26 * 26xm = 10xm
-a3 = sigmoid(a3);
+h3 = Theta2 * a2'; %10×26 * 26xm = 10xm
+a3 = sigmoid(h3);
 Y = zeros(num_labels,m);
 
  
 
 %Part2
-for i = 1:m
-	row = y(i);
-	Y(row, i) = 1;
+for index = 1:m
+	row = y(index);
+	Y(row, index) = 1;
 end
 
-J = 1/m * sum(sum( -Y .* log(a3) – (1-Y) .* log(1 – a3))) ;
+J = 1/m * sum(sum( -Y .* log(a3) - (1-Y) .* log(1 - a3))) ;
 
 J = J + lambda/(2*m) * ( sum(sum(Theta1(:,2:end).^2)) + sum(sum(Theta2(:,2:end).^2)) );
 
 for i = 1:m
 	a1 = X(i,:); % 1×401
 
-	z2 = Theta1 * a1′; % 25×401 * 401×1 = 25×1 vector
+	z2 = Theta1 * a1'; % 25×401 * 401×1 = 25×1 vector
 	a2 = sigmoid(z2);
 	a2 = [1; a2]; % add bias unit 26×1 vector
 
 	z3 = Theta2 * a2; % 10×26 * 26×1 = 10×1
 	a3 = sigmoid(z3); %
 
-	d3 = a3 – Y(:,i); % 10×1
-	d2 = Theta2’*d3 .* sigmoidGradient([1;z2]); % (26×10 * 10×1) .* 26×1 = 26×1 .* 26×1
+	d3 = a3 - Y(:,i); % 10×1
+	d2 = Theta2'*d3 .* sigmoidGradient([1;z2]); % (26×10 * 10×1) .* 26×1 = 26×1 .* 26×1
 
 	% Initially I implemented wrongly for the backprop algorithm
 	% My mistake was that I wrote d2 = Theta2’*d3 .* sigmoidGradient(a2)
@@ -103,7 +103,7 @@ for i = 1:m
 	% What we needed was computing the sigmoidGradient(z2)
 	% Also I need to add a bias unit to z2 ( [1;z2] ) to make it a 26×1 vector
 	Theta1_grad = Theta1_grad + d2(2:end) * a1; % 25×1 * 1×401 = 25×401
-	Theta2_grad = Theta2_grad + d3 * a2′; % 10×1 * 1×26 = 10×26
+	Theta2_grad = Theta2_grad + d3 * a2'; % 10×1 * 1×26 = 10×26
 end
 
  
