@@ -62,22 +62,78 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+%Part1
+X = [ones(m,1) X]; % add the theta 0 line
+h2 = Theta1 * X’ ; % 25×401 * 401xm = 25xm
+a2 = sigmoid(h2) ;
+a2 = [ones(m,1) a2′]; % mx26
 
+h3 = Theta2 * a2′; %10×26 * 26xm = 10xm
+a3 = sigmoid(a3);
+Y = zeros(num_labels,m);
 
+ 
 
+%Part2
+for i = 1:m
+	row = y(i);
+	Y(row, i) = 1;
+end
 
+J = 1/m * sum(sum( -Y .* log(a3) – (1-Y) .* log(1 – a3))) ;
 
+J = J + lambda/(2*m) * ( sum(sum(Theta1(:,2:end).^2)) + sum(sum(Theta2(:,2:end).^2)) );
 
+for i = 1:m
+	a1 = X(i,:); % 1×401
 
+	z2 = Theta1 * a1′; % 25×401 * 401×1 = 25×1 vector
+	a2 = sigmoid(z2);
+	a2 = [1; a2]; % add bias unit 26×1 vector
 
+	z3 = Theta2 * a2; % 10×26 * 26×1 = 10×1
+	a3 = sigmoid(z3); %
 
+	d3 = a3 – Y(:,i); % 10×1
+	d2 = Theta2’*d3 .* sigmoidGradient([1;z2]); % (26×10 * 10×1) .* 26×1 = 26×1 .* 26×1
 
+	% Initially I implemented wrongly for the backprop algorithm
+	% My mistake was that I wrote d2 = Theta2’*d3 .* sigmoidGradient(a2)
+	% What I was computing is actually sigmoidGradient of the sigmoid of z2 –> sigmoidGradient(sigmoid(z2))
+	% What we needed was computing the sigmoidGradient(z2)
+	% Also I need to add a bias unit to z2 ( [1;z2] ) to make it a 26×1 vector
+	Theta1_grad = Theta1_grad + d2(2:end) * a1; % 25×1 * 1×401 = 25×401
+	Theta2_grad = Theta2_grad + d3 * a2′; % 10×1 * 1×26 = 10×26
+end
 
+ 
 
+%Part3
+Theta1_grad(:,1:1) = 1/m * Theta1_grad(:,1:1);
+Theta2_grad(:,1:1) = 1/m * Theta2_grad(:,1:1);
 
+Theta1_grad(:,2:end) = 1/m * ( Theta1_grad(:,2:end) + lambda * Theta1(:,2:end) ) ;
+Theta2_grad(:,2:end) = 1/m * ( Theta2_grad(:,2:end) + lambda * Theta2(:,2:end) ) ;
 
+% I also make mistake in calculating Theta1 and Theta with regularization
+% Below is my initial implementation which did not pass the test
 
+% Theta1_grad = 1/m * Theta1_grad;
+% Theta2_grad = 1/m * Theta2_grad;
 
+% Theta1_grad(:,2:end) = Theta1_grad(:,2:end) + lambda/m * Theta1_grad(:,2:end)
+% Theta2_grad(:,2:end) = Theta2_grad(:,2:end) + lambda/m * Theta2_grad(:,2:end)
+
+% Let take only one element (rOriginal) from theta1_grad and put into simpler terms
+% wrong intepretation
+% rtemp = rOriginal/m
+% rfinal = rtemp + l*rtemp/m
+
+% correct implementation
+% rfinal = (rOriginal + l*rOriginal) / m = rOriginal/m + l*rOriginal/m (can be too written as below)
+% = rtemp + l*rOriginal/m
+
+% the subtle difference is l*rtemp vs l*rOriginal where rtemp != rOriginal therefore I got it wrong initially
 
 
 % -------------------------------------------------------------
