@@ -26,7 +26,7 @@ J = alpha*sum(h.^2);
 theta1 = [0 ; theta(2:size(theta), :)];
 
 % Rregularization
-Reg = lambda * sum(theta1 .^ 2) / (2 * m);
+Reg = alpha * lambda * sum(theta1 .^ 2);
 
 J = J + Reg;
 
